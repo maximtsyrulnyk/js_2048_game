@@ -1,115 +1,96 @@
 'use strict';
 
 // Uncomment the next lines to use your game instance in the browser
-const Game = require('../modules/Game.class');
+import { Game } from '../modules/Game.class.js';
+
 const game = new Game();
-const startBtn = document.querySelector('.start');
-const scoreBlock = document.querySelector('.game-score');
-const allCells = document.querySelectorAll('.field-cell');
-let clicked = false;
 
-function render() {
-  const gameField = game.getState();
-  const gamescore = game.getScore();
+const scoreElement = document.querySelector('.game-score');
+const startButton = document.querySelector('.start');
+const cells = document.querySelectorAll('.field-cell');
 
-  scoreBlock.textContent = String(gamescore);
+const messageStart = document.querySelector('.message-start');
+const messageWin = document.querySelector('.message-win');
+const messageLose = document.querySelector('.message-lose');
 
-  gameField.forEach((row, rowIndex) => {
-    row.forEach((cellValue, colIndex) => {
-      const cellIndex = rowIndex * 4 + colIndex;
+function updateUi() {
+  const board = game.getState();
+  const flatBoard = board.flat();
 
-      const cellElement = allCells[cellIndex];
+  flatBoard.forEach((value, index) => {
+    const cell = cells[index];
 
-      cellElement.textContent = '';
-      cellElement.className = 'field-cell';
+    cell.textContent = value !== 0 ? value : '';
+    cell.className = 'field-cell';
 
-      if (cellValue > 0) {
-        cellElement.textContent = cellValue;
-        cellElement.classList.add(`field-cell--${cellValue}`);
-      }
-    });
+    if (value > 0) {
+      cell.classList.add(`field-cell--${value}`);
+    }
   });
+
+  scoreElement.textContent = game.getScore();
+
+  updateMessage();
 }
 
-startBtn.addEventListener('click', () => {
-  removeMessage();
+function updateMessage() {
+  const currentStatus = game.getStatus();
 
+  messageStart.classList.add('hidden');
+  messageWin.classList.add('hidden');
+  messageLose.classList.add('hidden');
+
+  if (currentStatus === 'win') {
+    messageWin.classList.remove('hidden');
+  }
+
+  if (currentStatus === 'lose') {
+    messageLose.classList.remove('hidden');
+  }
+
+  if (currentStatus === 'idle') {
+    messageStart.classList.remove('hidden');
+  }
+}
+
+startButton.addEventListener('click', () => {
   if (game.getStatus() === 'idle') {
     game.start();
-
-    if (!clicked) {
-      startBtn.classList.remove('start');
-      startBtn.classList.add('restart');
-      startBtn.textContent = 'Restart';
-      clicked = true;
-    }
   } else {
     game.restart();
-    game.start();
-    render();
   }
-  render();
+
+  startButton.classList.remove('start');
+  startButton.classList.add('restart');
+  startButton.textContent = 'Restart';
+
+  updateUi();
 });
 
-document.addEventListener('keydown', handler);
-
-function handler(e) {
-  if (game.getStatus() !== 'playing') {
+document.addEventListener('keydown', (e) => {
+  if (game.getStatus() !== 'playing' && game.getStatus() !== 'win') {
     return;
   }
 
-  let madeMove = false;
+  const moveKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
-  switch (e.key) {
-    case 'ArrowLeft':
-      game.moveLeft();
-      madeMove = true;
-      break;
-    case 'ArrowRight':
-      game.moveRight();
-      madeMove = true;
-      break;
-    case 'ArrowUp':
-      game.moveUp();
-      madeMove = true;
-      break;
-    case 'ArrowDown':
-      game.moveDown();
-      madeMove = true;
-      break;
-    default:
-      return;
+  if (moveKeys.includes(e.key)) {
+    e.preventDefault();
+
+    switch (e.key) {
+      case 'ArrowUp':
+        game.moveUp();
+        break;
+      case 'ArrowDown':
+        game.moveDown();
+        break;
+      case 'ArrowLeft':
+        game.moveLeft();
+        break;
+      case 'ArrowRight':
+        game.moveRight();
+        break;
+    }
+    updateUi();
   }
-
-  if (madeMove) {
-    render();
-    updateScore();
-    checkStatus();
-  }
-}
-
-function updateScore() {
-  const score = game.getScore();
-
-  scoreBlock.textContent = score;
-}
-
-function checkStatus() {
-  const gameStatus = game.getStatus();
-
-  if (gameStatus === 'playing' || gameStatus === 'idle') {
-    return;
-  }
-
-  removeMessage();
-
-  const messageEl = document.querySelector(`.message-${gameStatus}`);
-
-  messageEl.classList.remove('hidden');
-}
-
-function removeMessage() {
-  const allMesseges = document.querySelectorAll('.message');
-
-  allMesseges.forEach((message) => message.classList.add('hidden'));
-}
+});
