@@ -1,73 +1,70 @@
-# 2048 game
+# 2048 Game
 
-Hey! Are you ready for a real hard check of your JavaScript skills, ninja?
-If you are still here, let's do it.
+2048 is a classic puzzle game implemented in vanilla JavaScript.
+The goal of the game is to combine tiles with the same values to reach the 2048 tile.
 
-In this task, you need to implement the 2048 game like in [this reference](https://play2048.co/)
-Don't play for too long! We need you to write the code!
+The project focuses on game logic, state management, keyboard controls, and DOM rendering without using external frameworks.
 
-Okay, what do we have?
+## Live Preview
+https://maximtsyrulnyk.github.io/js_2048-game/
 
-1. HTML and CSS are already written. You can use it, or implement your own design if you want.
-2. Base `Game` class structure is already written too. Extend it with your own methods. Obligatory methods (used in tests):
+## Repository
+https://github.com/maximtsyrulnyk/js_2048_game
 
-- constructor with `initialState` parameter (value is optional, defaults to the empty board)
-- `getState()`
-- `getScore()`
-- `getStatus()`
-- `moveLeft()`
-- `moveRight()`
-- `moveUp()`
-- `moveDown()`
-- `start()`
-- `restart()`
+## Technologies Used
 
-3. Reference.
+- JavaScript (ES6+)
+- HTML
+- CSS
+- OOP (class-based architecture)
+- DOM manipulation
 
-That's it!
+## Getting Started
 
-Okay, okay. Also, we have some rules:
+Clone the repository:
 
-1. The game field is 4 x 4
-2. Each cell can be empty or contain one of the numbers: 2, 4, 8 ... 2^n
-3. The player can move cells with keyboard arrows
-4. All the numbers should be moved in the selected direction until all empty cells are filled in
-   - 2 equal cells should be merged into a doubled number
-   - The merged cell can’t be merged twice during one move
-5. The move is possible if at least one cell is changed after the move
-6. After move 2 or 4 appears in a random empty cell. 4 probability is 10%
-7. When 2048 value is displayed in any cell, win message should be shown.
-8. The `game over` message should be shown if there are no more available moves.
-9. Hide start message when game starts.
-10. Change the `Start` button to `Restart` after the first move.
-11. `Restart` button should reset the game to the initial state.
-12. Increase score with each move. The score should be increased by the sum of all merged cells.
-13. The game consists of 2 main parts:
+```bash
+git clone https://github.com/your-username/2048-game.git
+cd 2048-game
+````
 
-- game logic written in `src/modules/Game.class.js` module that exports `Game` class
-- game UI written in `src/index.html` with `main.js` script that need to use `Game` class instance
+Open the project locally:
+```
+open index.html
+````
+Or run it using a local server (recommended).
 
-Hints:
+## Features
 
-- You have class `field-cell--%cell_value%`, for styling cell in the game.
-- Use `hidden` class for hiding elements on page.
-- Use `start`, `restart` classes for the main button for different styles.
-- Use `field-cell--%cell_value%` class like additional class, don't replace the main class.
-- Use `keydown` event and `event.key` property to handle arrow buttons presses
-  ```js
-  document.addEventListener('keydown', (event) => console.log(event.key));
-  ```
-- Adding animation to the game is optional. It is a bit tricky, but you can try it if you want. Probably, you will need to extend the Game class with additional methods and create a separate board storage with Tile entities to operate their corresponding DOM elements' positions.
+### • Classic 2048 gameplay
+Implements the original 4×4 grid gameplay with tile merging rules identical to the classic 2048 game.
 
-You can change the HTML/CSS layout if you need it.
+### • Keyboard controls
+The game is fully controlled using keyboard arrow keys:
+- ArrowLeft
+- ArrowRight
+- ArrowUp
+- ArrowDown
 
-![Preview](./src/images/reference.png)
+### • Game state management
+The game tracks:
+- Current board state
+- Score
+- Game status (idle, playing, win, lose)
 
-## Deploy and Pull Request
+### • Score calculation
+Scores are dynamically updated based on merged tile values.
 
-1. Replace `<your_account>` with your Github username in the link
-   - [DEMO LINK](https://maximtsyrulnyk.github.io/js_2048_game/)
-2. Follow [this instructions](https://mate-academy.github.io/layout_task-guideline/)
-   - Run `npm run test` command to test your code;
-   - Run `npm run test:only -- -n` to run fast test ignoring linter;
-   - Run `npm run test:only -- -l` to run fast test with additional info in console ignoring linter.
+### • Win and lose detection
+The game automatically detects:
+- Win condition when a 2048 tile is reached
+- Lose condition when no moves are available
+
+### • Restart functionality
+Players can restart the game at any time using the Start / Restart button.
+
+### • Random tile generation
+After each valid move, a new tile (2 or 4) is added to a random empty cell.
+
+### • Clean architecture
+Game logic is separated into a dedicated Game class, keeping rendering and input handling decoupled from core logic.

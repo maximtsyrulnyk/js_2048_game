@@ -1,96 +1,116 @@
 'use strict';
 
 // Uncomment the next lines to use your game instance in the browser
-import { Game } from '../modules/Game.class.js';
+const Game = require('../modules/Game.class');
+const game = new Game([
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+]);
 
-const game = new Game();
+// Write your code here
+const rows = 4;
+const columns = 4;
 
-const scoreElement = document.querySelector('.game-score');
-const startButton = document.querySelector('.start');
-const cells = document.querySelectorAll('.field-cell');
+const button = document.querySelector('.button');
+const score = document.querySelector('.game-score');
+const loseMessage = document.querySelector('.message-lose');
+const winMessage = document.querySelector('.message-win');
+const startMessage = document.querySelector('.message-start');
 
-const messageStart = document.querySelector('.message-start');
-const messageWin = document.querySelector('.message-win');
-const messageLose = document.querySelector('.message-lose');
+const createCellMap = () => {
+  const cellsList = [];
+  const rowsList = document.querySelectorAll('.game-field .field-row');
 
-function updateUi() {
-  const board = game.getState();
-  const flatBoard = board.flat();
+  rowsList.forEach((rowElement, r) => {
+    const rowCells = [];
+    const cellElements = rowElement.querySelectorAll('.field-cell');
 
-  flatBoard.forEach((value, index) => {
-    const cell = cells[index];
+    cellElements.forEach((cellElement, c) => {
+      rowCells.push(cellElement);
+    });
 
-    cell.textContent = value !== 0 ? value : '';
-    cell.className = 'field-cell';
-
-    if (value > 0) {
-      cell.classList.add(`field-cell--${value}`);
-    }
+    cellsList.push(rowCells);
   });
 
-  scoreElement.textContent = game.getScore();
+  return cellsList;
+};
 
-  updateMessage();
-}
+const cells = createCellMap();
 
-function updateMessage() {
-  const currentStatus = game.getStatus();
+const updateUI = () => {
+  score.textContent = game.getScore();
 
-  messageStart.classList.add('hidden');
-  messageWin.classList.add('hidden');
-  messageLose.classList.add('hidden');
+  const board = game.getState();
 
-  if (currentStatus === 'win') {
-    messageWin.classList.remove('hidden');
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < columns; c++) {
+      const value = board[r][c];
+      const cell = cells[r][c];
+
+      cell.className = '';
+      cell.classList.add('field-cell');
+
+      if (value) {
+        cell.innerText = value;
+        cell.classList.add(`field-cell--${value}`);
+      } else {
+        cell.innerText = '';
+      }
+    }
   }
 
-  if (currentStatus === 'lose') {
-    messageLose.classList.remove('hidden');
+  if (game.getStatus() === 'win') {
+    winMessage.classList.remove('hidden');
   }
 
-  if (currentStatus === 'idle') {
-    messageStart.classList.remove('hidden');
+  if (game.getStatus() === 'lose') {
+    loseMessage.classList.remove('hidden');
   }
-}
+};
 
-startButton.addEventListener('click', () => {
+const handleMove = (keyboard) => {
+  switch (keyboard) {
+    case 'ArrowLeft':
+      game.moveLeft();
+      break;
+    case 'ArrowRight':
+      game.moveRight();
+      break;
+    case 'ArrowUp':
+      game.moveUp();
+      break;
+    case 'ArrowDown':
+      game.moveDown();
+      break;
+  }
+  updateUI();
+};
+
+button.addEventListener('click', () => {
   if (game.getStatus() === 'idle') {
+    button.classList.remove('start');
+    button.classList.add('restart');
+    button.textContent = 'Reset';
+    startMessage.classList.add('hidden');
     game.start();
   } else {
+    button.classList.remove('restart');
+    button.classList.add('start');
+    button.textContent = 'Start';
+    startMessage.classList.remove('hidden');
+    loseMessage.classList.add('hidden');
+    winMessage.classList.add('hidden');
+
     game.restart();
   }
 
-  startButton.classList.remove('start');
-  startButton.classList.add('restart');
-  startButton.textContent = 'Restart';
-
-  updateUi();
+  updateUI();
 });
 
 document.addEventListener('keydown', (e) => {
-  if (game.getStatus() !== 'playing' && game.getStatus() !== 'win') {
-    return;
-  }
-
-  const moveKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-
-  if (moveKeys.includes(e.key)) {
-    e.preventDefault();
-
-    switch (e.key) {
-      case 'ArrowUp':
-        game.moveUp();
-        break;
-      case 'ArrowDown':
-        game.moveDown();
-        break;
-      case 'ArrowLeft':
-        game.moveLeft();
-        break;
-      case 'ArrowRight':
-        game.moveRight();
-        break;
-    }
-    updateUi();
+  if (game.getStatus() === 'playing') {
+    handleMove(e.key);
   }
 });
