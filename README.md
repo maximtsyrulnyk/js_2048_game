@@ -37,7 +37,7 @@ Every move spawns a new random tile in an empty cell.
 The game ends when there are no possible moves left or you reach 2048.
 
 📂 Project Structure
-Plaintext
+
 js_2048_game/
 ├── src/
 │   ├── modules/
